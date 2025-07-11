@@ -38,7 +38,7 @@ with st.form("log_form"):
 
     submitted = st.form_submit_button("Save Entry")
     if submitted:
-    st.success("✅ Entry saved! Your data is being used to improve tomorrow’s predictions.")
+        st.success("✅ Entry saved! Your data is being used to improve tomorrow’s predictions.")
 
 
 # Weather fetch function
@@ -56,18 +56,25 @@ def get_weather(city):
 # Save to CSV
 if submitted:
     temp, humidity = get_weather(city)
-    if temp is None:
-        st.error("⚠️ Could not fetch weather. Check city name or API key.")
-    else:
-        new_entry = {
-            "Date": entry_date,
-            "City": city,
-            "Temperature": temp,
-            "Humidity": humidity,
-            "Pain": pain_level,
-            "Stiffness": stiffness,
-            "Activity": activity,
-        }
+    new_entry = {
+        "Date": date,
+        "City": city,
+        "Temperature": temp,
+        "Humidity": humidity,
+        "Pain": pain,
+        "Stiffness": stiffness,
+        "Mood": mood,
+        "Activity": activity
+    }
+
+    try:
+        df = pd.read_csv("arthritis_log.csv")
+        df = pd.concat([df, pd.DataFrame([new_entry])], ignore_index=True)
+    except FileNotFoundError:
+        df = pd.DataFrame([new_entry])
+
+    df.to_csv("arthritis_log.csv", index=False)
+    st.success("✅ Entry saved! Your data is being used to improve tomorrow’s predictions.")
 
         
 # 🎯 Add AI predictions and advice before saving
@@ -94,30 +101,30 @@ else:
     stiffness_advice = "Avoid repetitive motion, go slow"
 
 # 📦 Build the full record
-new_entry = {
-    "Date": date,
-    "City": city,
-    "Pain": pain,
-    "Stiffness": stiffness,
-    "Mood": mood,
-    "Activity": activity,
-    "Temperature": temp,
-    "Humidity": humidity,
-    "Predicted_Pain": predicted_pain,
-    "Predicted_Stiffness": predicted_stiffness,
-    "Pain_Advice": pain_advice,
-    "Stiffness_Advice": stiffness_advice
-}
+#new_entry = {
+    #"Date": date,
+    #"City": city,
+    #"Pain": pain,
+    #"Stiffness": stiffness,
+    #"Mood": mood,
+    #"Activity": activity,
+    #"Temperature": temp,
+    #"Humidity": humidity,
+    #"Predicted_Pain": predicted_pain,
+    #"Predicted_Stiffness": predicted_stiffness,
+    #"Pain_Advice": pain_advice,
+    #"Stiffness_Advice": stiffness_advice
+#}
 
 # 📄 Save to CSV
-try:
-    df = pd.read_csv("arthritis_log.csv")
-    df = pd.concat([df, pd.DataFrame([new_entry])], ignore_index=True)
-except FileNotFoundError:
-    df = pd.DataFrame([new_entry])
+#try:
+ #   df = pd.read_csv("arthritis_log.csv")
+  #  df = pd.concat([df, pd.DataFrame([new_entry])], ignore_index=True)
+#except FileNotFoundError:
+ #   df = pd.DataFrame([new_entry])
 
-df.to_csv("arthritis_log.csv", index=False)
-st.success("✅ Entry with predictions saved!")
+#df.to_csv("arthritis_log.csv", index=False)
+#st.success("✅ Entry with predictions saved!")
 
 # Show past entries
 st.markdown("### 📊 Past Symptom Log")
